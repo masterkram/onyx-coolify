@@ -1,0 +1,56 @@
+# =============================================================================
+# ONYX LITE — MINIMAL DEPLOYMENT OVERLAY
+# =============================================================================
+name: onyx
+services:
+  api_server:
+    depends_on:
+      index:
+        condition: service_started
+        required: false
+      opensearch:
+        condition: service_started
+        required: false
+      cache:
+        condition: service_started
+        required: false
+      inference_model_server:
+        condition: service_started
+        required: false
+      minio:
+        condition: service_started
+        required: false
+      nginx:
+        condition: service_started
+        required: false
+    environment:
+      - DISABLE_VECTOR_DB=true
+      - FILE_STORE_BACKEND=postgres
+      - CACHE_BACKEND=postgres
+      - AUTH_BACKEND=postgres
+  background:
+    profiles: ["background"]
+    depends_on:
+      index:
+        condition: service_started
+        required: false
+      inference_model_server:
+        condition: service_started
+        required: false
+      indexing_model_server:
+        condition: service_started
+        required: false
+  cache:
+    profiles: ["redis"]
+  index:
+    profiles: ["vectordb"]
+  indexing_model_server:
+    profiles: ["vectordb"]
+  inference_model_server:
+    profiles: ["inference"]
+  opensearch:
+    profiles: ["opensearch"]
+  minio:
+    profiles: ["s3-filestore"]
+  nginx:
+    profiles: ["nginx"]
